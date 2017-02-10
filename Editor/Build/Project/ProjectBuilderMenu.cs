@@ -18,7 +18,7 @@ namespace UniFramework.Editor
 
 
 		[MenuItem ("Build/CI/Build IOS")]
-		public static void PerformiOSTestServerBuild ()
+		public static void PerformiOSBuild ()
 		{ 
 			BuildOptions opt = BuildOptions.None;
 
