@@ -4,29 +4,7 @@ using UnityEngine;
 
 namespace UniFramework
 {
-	internal interface IAsyncTask :IEnumerator
-	{
-		bool IsDone {
-			get ;
-		}
-
-
-		float Progress {
-			get;
-		}
-
-		string Name {
-			get;
-		}
-
-		bool IsAbort {
-			get ;
-		}
-
-		void Abort ();
-
-
-	}
+	
 
 	public abstract class  AsyncTask : CustomYieldInstruction
 	{	

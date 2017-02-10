@@ -35,8 +35,7 @@ namespace UniFramework.Extension.Helper
 
 		protected  virtual void OnDisable ()
 		{
-			scriptDataList = null;
-			currentInvokeTime = 0;
+			
 		}
 
 		protected virtual void Update ()
@@ -49,7 +48,6 @@ namespace UniFramework.Extension.Helper
 
 			for (int i = 0; i < scriptDataList.Count; i++) {
 				for (int j = 0; j < scriptDataList [i].invokeList.Count; j++) {
-				
 					InvokeData data = scriptDataList [i].invokeList [j];
 					if (currentInvokeTime - data.time >= data.delay) {
 						if (data.isRepeat) {
@@ -59,6 +57,7 @@ namespace UniFramework.Extension.Helper
 						}
 						if (data.callback != null) {
 							data.callback ();
+
 						}
 					}
 

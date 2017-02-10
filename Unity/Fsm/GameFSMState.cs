@@ -19,7 +19,9 @@ namespace UniFramework.Fsm
 		}
 
 
-		private List<InvokeData> invokeList;
+		public float TimeScale = 1;
+
+		private List<InvokeData> invokeList= new List<InvokeData> (); 
 
 		private float currentInvokeTime;
 
@@ -45,7 +47,7 @@ namespace UniFramework.Fsm
 		public override void OnPreUpdate ()
 		{
 			base.OnPreUpdate ();
-			currentInvokeTime +=  Time.deltaTime;;
+			currentInvokeTime +=  Time.deltaTime *TimeScale;
 
 			for (int i = 0; i < invokeList.Count; i++) {
 				InvokeData data = invokeList [i];

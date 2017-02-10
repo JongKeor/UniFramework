@@ -7,11 +7,13 @@ namespace UniFramework.Fsm
 	{
 		public FSMSystem fsm;
 		public bool resetOnDisable = true;
+		public bool playOnAwake = true;
 
 		protected virtual void Awake ()
 		{
 			fsm = GenreateFSM ();
-			fsm.Build ();
+			if(fsm != null)
+				fsm.Build ();
 		}
 
 		protected virtual void Start ()
@@ -21,7 +23,9 @@ namespace UniFramework.Fsm
 
 		protected virtual void OnEnable ()
 		{
-			if(fsm != null)fsm.Play ();
+			if(playOnAwake){
+				if(fsm != null)fsm.Play ();
+			}
 		}
 
 		protected virtual void OnDisable ()
@@ -39,7 +43,7 @@ namespace UniFramework.Fsm
 		protected virtual void  Update ()
 		{
 		
-			if (fsm.IsPlay) {
+			if (fsm != null &&fsm.IsPlay) {
 				fsm.Update ( );
 			}
 		}

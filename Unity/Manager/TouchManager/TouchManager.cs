@@ -6,7 +6,7 @@ using UniFramework.Generic;
 
 namespace UniFramework.TouchInput
 {
-	public class TouchManager : SingletonMonoBehaviour<MonoBehaviour>
+	public class TouchManager : SingletonMonoBehaviour<TouchManager>
 	{
 		private List<AbstractGestureDetector> detectors = new List<AbstractGestureDetector> ();
 		private CustomInput lastInput = null;
@@ -14,7 +14,12 @@ namespace UniFramework.TouchInput
 
 		public T GetGesture<T> () where T : AbstractGestureDetector
 		{
-			return  detectors.Find (o => o is T) as T;
+			T gesture = detectors.Find (o => o is T) as T;
+			if(gesture == null){
+				gesture = this.GetOrAddComponent<T>();
+				detectors.Add(gesture);
+			}
+			return  gesture;
 		}
 
 		private static bool IsTouchPlatform { 
@@ -129,6 +134,8 @@ namespace UniFramework.TouchInput
 
 			this.lastInput = currentInput;
 		}
+
+
 	}
 }
   
