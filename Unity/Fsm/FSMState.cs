@@ -7,7 +7,7 @@ namespace UniFramework.Fsm
 {
 	public abstract class FSMState : IFSMState
 	{
-		public IFSMSystem Fsm;
+		public FSMSystem Fsm;
 
 		public MonoBehaviour Owner {
 			get {
@@ -15,7 +15,7 @@ namespace UniFramework.Fsm
 			}
 		}
 
-		public IFSMSystem subFsm;
+		public FSMSystem subFsm;
 		protected Dictionary<string, IFSMState> map = new Dictionary<string, IFSMState> ();
 
 		public void AddEvent (string trans, IFSMState s)

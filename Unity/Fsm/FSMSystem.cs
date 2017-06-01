@@ -4,7 +4,7 @@ using System.Collections;
 namespace UniFramework.Fsm
 {
 	
-	public class FSMSystem : IFSMSystem
+	public class FSMSystem 
 	{
 		public MonoBehaviour Owner {
 			get {
@@ -136,15 +136,12 @@ namespace UniFramework.Fsm
 			if (s == null) {
 				Debug.LogError ("FSM ERROR: Null reference is not allowed");
 			}
-			foreach (FSMState state in states) {
+			foreach (IFSMState state in states) {
 				if (state.Equals (s)) {
 					Debug.LogError ("FSM ERROR: Impossible to add state " + s.ToString () +
 					" because state has already been added");
 					return;
 				}
-			}
-			if(s is FSMState){
-				((FSMState)s).Fsm = this;
 			}
 			states.Add (s);
 		}
@@ -175,7 +172,7 @@ namespace UniFramework.Fsm
 
 		public bool SendEventToSub (string eventName, params object[] param)
 		{
-			FSMState s = currentState as FSMState;
+			IFSMState s = currentState as IFSMState;
 			if(s != null){
 				if (s.subFsm != null) {
 					return s.subFsm.SendEvent (eventName, param);
@@ -213,7 +210,7 @@ namespace UniFramework.Fsm
 			} else {
 				s = currentState.GetOutputState (eventName) as FSMState;
 			}
-			foreach (FSMState state in states) {
+			foreach (IFSMState state in states) {
 				if (state.Equals (s)) {
 					SwitchState (state, paramDic);
 					while (queueEventInfo.Count != 0) {

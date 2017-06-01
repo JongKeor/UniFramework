@@ -15,15 +15,13 @@ namespace UniFramework
 			}
 		}
 
-		#region implemented abstract members of CustomYieldInstruction
+		
 
 		public override bool keepWaiting {
 			get {
 				 return IsDone == false;
 			}
 		}
-
-		#endregion
 
 		public string Name {
 			get {

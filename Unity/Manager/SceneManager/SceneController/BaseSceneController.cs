@@ -125,18 +125,6 @@ namespace UniFramework
 			SetSceneCanvasOrder (SceneDepth);
 
 		}
-
-		protected  void OnEnable ()
-		{
-//			Debug.Log ("OnEnable " + name + " " + Time.frameCount);
-			
-		}
-
-		protected  void OnDisable ()
-		{
-//			Debug.Log ("OnDisable " + name + " " + Time.frameCount);
-		}
-
 		protected  void OnDestroy ()
 		{
 			if (!isApplicationQuit) {
@@ -160,12 +148,11 @@ namespace UniFramework
 					MySceneInfo.UnRegisterSceneController();
 				}
 			}
-//			Debug.Log ("OnDestroy " + name + " " + Time.frameCount);
 		}
 
 		protected  void Start ()
 		{
-//			Debug.Log ("Start " + name + " " + Time.frameCount);
+
 		}
 
 		protected  void  OnApplicationQuit ()
