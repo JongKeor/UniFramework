@@ -7,29 +7,19 @@ namespace UniFramework.Extension
 	public static class GameObjectExtension
 	{
 
-		public static T GetOrAddComponent<T> (this GameObject child) where T: Component
+		public static T GetOrAddComponent<T> (this GameObject self) where T: Component
 		{
-			return  GetOrAddComponent (child, typeof(T)) as T;
+			return  GetOrAddComponent (self, typeof(T)) as T;
 		}
 
-		public static Component GetOrAddComponent (this GameObject child, System.Type type)
+		public static Component GetOrAddComponent (this GameObject self, System.Type type)
 		{
-			Component result = child.GetComponent (type);
+			Component result = self.GetComponent (type);
 			if (result == null) {
-				result = child.gameObject.AddComponent (type);
+				result = self.AddComponent (type);
 			}
 			return result;
 		}
-		
-		//
-		//	public static void IterateChildren (this GameObject self, System.Func<GameObject, bool>  childHandler)
-		//	{
-		//		foreach (Transform child in self.transform) {
-		//			if (childHandler (child.gameObject)) {
-		//				child.gameObject.IterateChildren (childHandler);
-		//			}
-		//		}
-		//	}
 
 		public static GameObject FindChildObjectByName (this GameObject self, string strName)
 		{
@@ -69,67 +59,40 @@ namespace UniFramework.Extension
 			}
 			return ret.ToArray ();
 		}
+	}
 
-		public static float GetColliderXZRadius (this GameObject obj)
+
+	public static class GameObjectPauseExtension 
+	{
+		public static void Pause(this GameObject self)
 		{
-			CapsuleCollider capsule = obj.GetComponent<CapsuleCollider> ();
-			if (capsule != null) {
-				return capsule.radius;
-			}
-			BoxCollider box = obj.GetComponent<BoxCollider> ();
-			if (box != null) {
-				return box.bounds.size.x < box.bounds.size.z ? box.bounds.size.z : box.bounds.size.x;
+			MonoBehaviour[] comps = self.GetComponentsInChildren<MonoBehaviour>();
+			for(int i = 0 ; i < comps.Length ; i++)
+			{	
+				comps[i].enabled = false;
 			}
 
-			SphereCollider sphere = obj.GetComponent<SphereCollider> ();
-			if (sphere != null) {
-				return sphere.radius;
-			}
-
-			CharacterController cc = obj.GetComponent<CharacterController> ();
-			if (cc != null) {
-				return cc.radius;
-			}
-
-			MeshCollider mesh = obj.GetComponent<MeshCollider> ();
-			if (mesh != null) {
-				return mesh.bounds.size.x < mesh.bounds.size.z ? mesh.bounds.size.z : mesh.bounds.size.x;
-			}
-
-			return 0;
+			self.GetComponent<ParticleSystem>().Play();
+			self.GetComponent<Animation>().Play();
+			self.GetComponent<Animator>().speed = 1;
+			self.GetComponent<Rigidbody>().SetPlaySpeed(1);
+			self.GetComponent<Rigidbody2D>().simulated = true;
 		}
-
-		public static Vector3 GetColliderCenter (this GameObject obj)
+		public static void Resume(this GameObject self)
 		{
-			if (obj == null) {
-				return Vector3.zero;
-			}
-			CapsuleCollider capsule = obj.GetComponent<CapsuleCollider> ();
-			if (capsule != null) {
-				return obj.transform.TransformPoint (capsule.center);
-			}
-			BoxCollider box = obj.GetComponent<BoxCollider> ();
-			if (box != null) {
-				return obj.transform.TransformPoint (box.center);
-			}
-			SphereCollider sphere = obj.GetComponent<SphereCollider> ();
-			if (sphere != null) {
-				return obj.transform.TransformPoint (sphere.center);
-			}
+			MonoBehaviour[] comps = self.GetComponentsInChildren<MonoBehaviour>();
+			for(int i = 0 ; i < comps.Length ; i++)
+			{	
+				comps[i].enabled = true;
+			}	
 
-			CharacterController cc = obj.GetComponent<CharacterController> ();
-			if (cc != null) {
-				return obj.transform.TransformPoint (cc.center);
-			}
-
-			MeshCollider mesh = obj.GetComponent<MeshCollider> ();
-			if (mesh != null) {
-				return obj.transform.TransformPoint (mesh.bounds.center);
-			}
-
-			return Vector3.zero;
+			self.GetComponent<ParticleSystem>().Pause();
+			self.GetComponent<Animation>().Stop();
+			self.GetComponent<Animator>().speed = 0;
+			self.GetComponent<Rigidbody>().SetPlaySpeed(0);
+			self.GetComponent<Rigidbody2D>().simulated = false;
 		}
-
+	
 	}
 }
 

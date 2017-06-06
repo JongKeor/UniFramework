@@ -17,7 +17,7 @@ namespace UniFramework.Net
 		public AsyncTask Request (Http http, System.Action<Http> onSuccess, System.Action<System.Exception>  onFail)
 		{
 
-			var asyncResult = http.Request (GlobalMonoBehaviour.Instance);
+			var asyncResult = http.Request (this);
 			http.onSuccess += (www) => {
 				downloadingTask.Remove (asyncResult);
 				if (downloadingTask.Count == 0)

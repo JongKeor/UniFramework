@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace UniFramework.Extension
 {
 
-	public static class EnumerableExt
+	public static class EnumerableExtension
 	{
 		public static IEnumerable<T> Empty<T> ()
 		{

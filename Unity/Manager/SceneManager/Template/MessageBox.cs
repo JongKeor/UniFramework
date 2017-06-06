@@ -23,6 +23,7 @@ namespace UniFramework
 
 	public class MessageBox : BaseSceneController
 	{
+		public const string SCENE_NAME = "MessageBox";
 		public const string PARAM_MESSAGE = "message";
 		public const string PARAM_MESSAGE_TYPE = "messageType";
 
@@ -47,7 +48,7 @@ namespace UniFramework
 			Dictionary<string,object> dic = new Dictionary<string, object> ();
 			dic.Add (MessageBox.PARAM_MESSAGE, message);
 			dic.Add (MessageBox.PARAM_MESSAGE_TYPE, type);
-			GameSceneManager.Instance.Root.GetSceneController<BaseSceneController>().Popup (ApplicationMeta.messageBoxScene, dic, null, (ctrl) => {
+			GameSceneManager.Instance.Root.GetSceneController<BaseSceneController>().Popup (MessageBox.SCENE_NAME, dic, null, (ctrl) => {
 				MessageBox msg = ctrl as MessageBox;
 				if (finish != null)
 					finish (msg.result);
@@ -57,20 +58,28 @@ namespace UniFramework
 
 		private MessageBoxType type;
 		private MessageBoxResult result;
+
+		[SerializeField]
 		private Button closeButton;
+		[SerializeField]
 		private Button yesButton;
+		[SerializeField]
 		private Button noButton;
+		[SerializeField]
 		private Text messageText;
 
+		protected override void Reset(){
+			base.Reset();
+			messageText = canvases[0].gameObject.FindChildObjectByName (MESSAGE_TEXT).GetComponent<Text> ();
+			closeButton = canvases[0].gameObject.FindChildObjectByName (CLOSE_BUTTON).GetComponent<Button> ();
+			yesButton = canvases[0].gameObject.FindChildObjectByName (YES_BUTTON).GetComponent<Button> ();
+			noButton = canvases[0].gameObject.FindChildObjectByName (NO_BUTTON).GetComponent<Button> ();
+		}		
 
 		public override void OnLoad ()
 		{
 			base.OnLoad();
 			result = MessageBoxResult.Yes;
-			messageText = canvases[0].gameObject.FindChildObjectByName (MESSAGE_TEXT).GetComponent<Text> ();
-			closeButton = canvases[0].gameObject.FindChildObjectByName (CLOSE_BUTTON).GetComponent<Button> ();
-			yesButton = canvases[0].gameObject.FindChildObjectByName (YES_BUTTON).GetComponent<Button> ();
-			noButton = canvases[0].gameObject.FindChildObjectByName (NO_BUTTON).GetComponent<Button> ();
 
 		}
 		public override void OnOpen (Dictionary<string, object> arguments)

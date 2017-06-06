@@ -44,9 +44,9 @@ namespace UniFramework.Fsm
 			CancelInvoke ();
 		}
 
-		public override void OnPreUpdate ()
+		public override void OnUpdate ()
 		{
-			base.OnPreUpdate ();
+			base.OnUpdate ();
 			currentInvokeTime +=  Time.deltaTime *TimeScale;
 
 			for (int i = 0; i < invokeList.Count; i++) {

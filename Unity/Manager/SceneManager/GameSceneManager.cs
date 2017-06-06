@@ -14,8 +14,6 @@ using UniFramework.Extension;
 
 namespace UniFramework
 {
-	
-
 
 	public class GameSceneManager : SingletonMonoBehaviour<GameSceneManager>
 	{
@@ -48,6 +46,8 @@ namespace UniFramework
 			SceneManager.activeSceneChanged += (arg0, arg1) => {
 				Debug.Log("ActiveSceneChanged " +  arg0.name + " "  + arg1.name+ " "  + Time.frameCount);
 			};
+
+			
 		}
 
 		private void SceneManager_sceneLoaded (Scene scene, LoadSceneMode mode)
@@ -63,8 +63,6 @@ namespace UniFramework
 				onSceneUnLoad (info);
 				UnregisterSceneInfo (scene);
 			} 
-
-
 		}
 
 
