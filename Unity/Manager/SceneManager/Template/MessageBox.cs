@@ -8,108 +8,116 @@ using UniFramework.Extension;
 
 namespace UniFramework
 {
-	public enum MessageBoxType
-	{
-		Close,
-		YesNo,
-	}
+    public enum MessageBoxType
+    {
+        Close,
+        YesNo,
+    }
 
-	public enum MessageBoxResult
-	{
-		Yes,
-		No,
-	}
-
-
-	public class MessageBox : BaseSceneController
-	{
-		public const string SCENE_NAME = "MessageBox";
-		public const string PARAM_MESSAGE = "message";
-		public const string PARAM_MESSAGE_TYPE = "messageType";
-
-		private const string MESSAGE_TEXT = "_MessageText";
-		private const string CLOSE_BUTTON = "_CloseButton";
-		private const string YES_BUTTON = "_YesButton";
-		private const string NO_BUTTON = "_NoButton";
+    public enum MessageBoxResult
+    {
+        Yes,
+        No,
+    }
 
 
-		public static void ShowMessageBox ( string message, System.Action<MessageBoxResult> finish)
-		{
-			ShowMessageBox ( MessageBoxType.Close, message, finish);
-		}
+    public class MessageBox : BaseSceneController
+    {
+        public const string SCENE_NAME = "MessageBox";
+        public const string PARAM_MESSAGE = "message";
+        public const string PARAM_MESSAGE_TYPE = "messageType";
 
-		public static void ShowYesNoMessageBox ( string message, System.Action<MessageBoxResult> finish)
-		{
-			ShowMessageBox ( MessageBoxType.YesNo, message, finish);
-		}
-
-		public static void ShowMessageBox ( MessageBoxType type, string message, System.Action<MessageBoxResult> finish)
-		{
-			Dictionary<string,object> dic = new Dictionary<string, object> ();
-			dic.Add (MessageBox.PARAM_MESSAGE, message);
-			dic.Add (MessageBox.PARAM_MESSAGE_TYPE, type);
-			GameSceneManager.Instance.Root.GetSceneController<BaseSceneController>().Popup (MessageBox.SCENE_NAME, dic, null, (ctrl) => {
-				MessageBox msg = ctrl as MessageBox;
-				if (finish != null)
-					finish (msg.result);
-			});
-		}
+        private const string MESSAGE_TEXT = "_MessageText";
+        private const string CLOSE_BUTTON = "_CloseButton";
+        private const string YES_BUTTON = "_YesButton";
+        private const string NO_BUTTON = "_NoButton";
 
 
-		private MessageBoxType type;
-		private MessageBoxResult result;
+        public static void ShowMessageBox(string message, System.Action<MessageBoxResult> finish)
+        {
+            ShowMessageBox(MessageBoxType.Close, message, finish);
+        }
 
-		[SerializeField]
-		private Button closeButton;
-		[SerializeField]
-		private Button yesButton;
-		[SerializeField]
-		private Button noButton;
-		[SerializeField]
-		private Text messageText;
+        public static void ShowYesNoMessageBox(string message, System.Action<MessageBoxResult> finish)
+        {
+            ShowMessageBox(MessageBoxType.YesNo, message, finish);
+        }
 
-		protected override void Reset(){
-			base.Reset();
-			messageText = canvases[0].gameObject.FindChildObjectByName (MESSAGE_TEXT).GetComponent<Text> ();
-			closeButton = canvases[0].gameObject.FindChildObjectByName (CLOSE_BUTTON).GetComponent<Button> ();
-			yesButton = canvases[0].gameObject.FindChildObjectByName (YES_BUTTON).GetComponent<Button> ();
-			noButton = canvases[0].gameObject.FindChildObjectByName (NO_BUTTON).GetComponent<Button> ();
-		}		
-
-		public override void OnLoad ()
-		{
-			base.OnLoad();
-			result = MessageBoxResult.Yes;
-
-		}
-		public override void OnOpen (Dictionary<string, object> arguments)
-		{
-			base.OnOpen (arguments);
-
-			messageText.text = arguments [PARAM_MESSAGE].ToString ();
-			type = (MessageBoxType)arguments [PARAM_MESSAGE_TYPE];
+        public static void ShowMessageBox(MessageBoxType type, string message, System.Action<MessageBoxResult> finish)
+        {
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+            dic.Add(MessageBox.PARAM_MESSAGE, message);
+            dic.Add(MessageBox.PARAM_MESSAGE_TYPE, type);
+            GameSceneManager.Instance.Root.GetSceneController<BaseSceneController>().Popup(MessageBox.SCENE_NAME, dic, null, (ctrl) =>
+            {
+                MessageBox msg = ctrl as MessageBox;
+                if (finish != null)
+                    finish(msg.result);
+            });
+        }
 
 
-			noButton.onClick.AddListener (() => {
-				result = MessageBoxResult.No;
-				Close ();
+        private MessageBoxType type;
+        private MessageBoxResult result;
 
-			});
-			yesButton.onClick.AddListener (() => {
-				result = MessageBoxResult.Yes;
-				Close ();
-			});
-			closeButton.onClick.AddListener (() => {
-				result = MessageBoxResult.No;
-				Close ();
-			});
-			if (type == MessageBoxType.Close) {
-				yesButton.gameObject.SetActive (false);
-				noButton.gameObject.SetActive (false);
-			} else if (type == MessageBoxType.YesNo) {
-				closeButton.gameObject.SetActive (false);
-			}
-		}
+        [SerializeField]
+        private Button closeButton;
+        [SerializeField]
+        private Button yesButton;
+        [SerializeField]
+        private Button noButton;
+        [SerializeField]
+        private Text messageText;
 
-	}
+        protected override void Reset()
+        {
+            base.Reset();
+            messageText = canvases[0].gameObject.FindChildObjectByName(MESSAGE_TEXT).GetComponent<Text>();
+            closeButton = canvases[0].gameObject.FindChildObjectByName(CLOSE_BUTTON).GetComponent<Button>();
+            yesButton = canvases[0].gameObject.FindChildObjectByName(YES_BUTTON).GetComponent<Button>();
+            noButton = canvases[0].gameObject.FindChildObjectByName(NO_BUTTON).GetComponent<Button>();
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            result = MessageBoxResult.Yes;
+
+        }
+        public override void OnOpen(Dictionary<string, object> arguments)
+        {
+            base.OnOpen(arguments);
+
+            messageText.text = arguments[PARAM_MESSAGE].ToString();
+            type = (MessageBoxType)arguments[PARAM_MESSAGE_TYPE];
+
+
+            noButton.onClick.AddListener(() =>
+            {
+                result = MessageBoxResult.No;
+                Close();
+
+            });
+            yesButton.onClick.AddListener(() =>
+            {
+                result = MessageBoxResult.Yes;
+                Close();
+            });
+            closeButton.onClick.AddListener(() =>
+            {
+                result = MessageBoxResult.No;
+                Close();
+            });
+            if (type == MessageBoxType.Close)
+            {
+                yesButton.gameObject.SetActive(false);
+                noButton.gameObject.SetActive(false);
+            }
+            else if (type == MessageBoxType.YesNo)
+            {
+                closeButton.gameObject.SetActive(false);
+            }
+        }
+
+    }
 }

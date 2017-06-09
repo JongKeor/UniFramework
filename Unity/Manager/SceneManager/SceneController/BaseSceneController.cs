@@ -33,14 +33,7 @@ namespace UniFramework
         {
             get
             {
-                if (Parent == null)
-                {
-                    return MySceneInfo;
-                }
-                else
-                {
-                    return Parent;
-                }
+                return GameSceneManager.Instance.Root;
             }
         }
 
@@ -113,7 +106,7 @@ namespace UniFramework
         protected SceneInfo sceneInfo;
         protected SceneInfo parent = null;
         protected List<SceneInfo> childs = new List<SceneInfo>();
-        protected bool isReadyToOpen = true;
+
         protected bool isApplicationQuit = false;
 
         private SceneInfo currentPopup;
@@ -124,7 +117,13 @@ namespace UniFramework
 
         #region Unity Callback
 
+        protected virtual void Awake()
+        {
+            GameSceneManager.Instance.GetSceneInfo(this.Scene);
+            
+             Debug.Log("Awake " + name + " " + Time.frameCount + " " );
 
+        }
         protected virtual void Reset()
         {
             canvases = System.Array.FindAll<Canvas>(GameObject.FindObjectsOfType<Canvas>(),
@@ -134,23 +133,9 @@ namespace UniFramework
             eventSystem = System.Array.Find<EventSystem>(GameObject.FindObjectsOfType<EventSystem>(),
                 (es) => es.gameObject.scene == gameObject.scene
             );
-            eventSystem.enabled = false;
-        }
-
-        protected virtual void Awake()
-        {
-
-            sceneInfo = GameSceneManager.Instance.GetSceneInfo(this.gameObject.scene);
-            MySceneInfo.RegisterSceneController(this);
-
-            if (sceneInfo.SceneType == SceneType.Screen && sceneInfo.Parent == null)
-            {
-                eventSystem.enabled = true;
-            }
-
-            SetSceneCanvasOrder(SceneDepth);
 
         }
+
         protected void OnDestroy()
         {
             if (!isApplicationQuit)
@@ -180,10 +165,6 @@ namespace UniFramework
             }
         }
 
-        protected void Start()
-        {
-
-        }
 
         protected void OnApplicationQuit()
         {
@@ -194,21 +175,14 @@ namespace UniFramework
 
         #region implemented interface members of ISceneController
 
-        public virtual bool IsReady()
-        {
-            return isReadyToOpen;
-        }
-
-
-        public virtual void OnLoad()
-        {
-            Debug.Log("OnLoad " + name + " " + Time.frameCount + " " + gameObject.scene.GetHashCode());
-        }
 
         public virtual void OnOpen(Dictionary<string, object> arguments)
         {
-
+           
             Debug.Log("OnOpen " + name + " " + Time.frameCount + " " + gameObject.scene.GetHashCode());
+            if(Parent != null){
+                SetSceneCanvasOrder(SceneDepth);
+            }
         }
 
 
@@ -286,10 +260,7 @@ namespace UniFramework
                 Debug.LogWarning("Cannot Additive Scene in Popup Scene ");
                 return;
             }
-            var rootController = Root.GetSceneController<BaseSceneController>();
-            rootController.eventSystem.enabled = false;
-
-
+            Root.GetSceneController<BaseSceneController>().eventSystem.enabled = false;
             SceneInfo newScene = new SceneInfo(MySceneInfo, name, LoadSceneMode.Additive, args,
                                      (info) =>
                                      {
@@ -306,18 +277,12 @@ namespace UniFramework
                 this.childs.Remove(newScene);
             };
             this.childs.Add(newScene);
-            GameSceneManager.Instance.LoadSceneAsync(newScene,
-                () =>
-                {
-                    rootController.eventSystem.enabled = true;
-                },
-                (ex) =>
-                {
-                    rootController.eventSystem.enabled = true;
-                    this.childs.Remove(newScene);
-                    Debug.LogError(ex);
-                }
-            );
+            GameSceneManager.Instance.LoadScene(newScene, _ =>
+            {
+                newScene.GetSceneController<BaseSceneController>().eventSystem.enabled = false;
+                Root.GetSceneController<BaseSceneController>().eventSystem.enabled = true;
+            });
+
         }
 
         public void Switch(string name, Dictionary<string, object> args = null, System.Action<BaseSceneController> onOpen = null, System.Action<BaseSceneController> onClose = null)
@@ -327,8 +292,7 @@ namespace UniFramework
                 Debug.LogWarning("Cannot Switch Scene  in Popup Scene ");
                 return;
             }
-            var rootController = Root.GetSceneController<BaseSceneController>();
-            rootController.eventSystem.enabled = false;
+            Root.GetSceneController<BaseSceneController>().eventSystem.enabled = false;
             SceneInfo newScene = new SceneInfo(name, LoadSceneMode.Single, args,
                                      (info) =>
                                      {
@@ -340,17 +304,11 @@ namespace UniFramework
                                          if (onClose != null)
                                              onClose(info.GetSceneController<BaseSceneController>());
                                      });
-            GameSceneManager.Instance.LoadSceneAsync(newScene,
-                () =>
-                {
-                    newScene.GetSceneController<BaseSceneController>().eventSystem.enabled = true;
-                },
-                (ex) =>
-                {
-                    rootController.eventSystem.enabled = true;
-                    Debug.LogError(ex);
-                }
-            );
+            GameSceneManager.Instance.LoadScene(newScene, _ =>
+            {
+                Root.GetSceneController<BaseSceneController>().eventSystem.enabled = true;
+            });
+
         }
 
         public void PopupUniqueScene(string name, Dictionary<string, object> args = null, System.Action<BaseSceneController> onOpen = null, System.Action<BaseSceneController> onClose = null)
@@ -359,9 +317,8 @@ namespace UniFramework
             if (currentSinglePopup != null)
             {
                 var rootController = Root.GetSceneController<BaseSceneController>();
-                rootController.eventSystem.enabled = false;
                 rootController.SetEnableCanvas(false);
-
+                Root.GetSceneController<BaseSceneController>().eventSystem.enabled = false;
                 SceneInfo newScene = new SceneInfo(name, LoadSceneMode.Additive, args,
                     (info) =>
                     {
@@ -381,21 +338,16 @@ namespace UniFramework
                     rootController.SetEnableCanvas(true);
                 };
                 currentSinglePopup = newScene;
-                GameSceneManager.Instance.LoadSceneAsync(newScene,
-                    () =>
-                    {
-                        rootController.eventSystem.enabled = true;
-                        newScene.GetSceneController<BaseSceneController>().SetSceneCanvasOrder(Root.GetSceneController<BaseSceneController>().GetTopSceneCanvasOrder() + 2);
-                    },
-                    (ex) =>
-                    {
-                        popupSingleCount = 0;
-                        currentSinglePopup = null;
-                        rootController.SetEnableCanvas(true);
-                        rootController.eventSystem.enabled = true;
-                        Debug.LogError(ex);
-                    }
-                );
+                GameSceneManager.Instance.LoadScene(newScene, _ =>
+             {
+                 newScene.GetSceneController<BaseSceneController>().eventSystem.enabled = false;
+                 newScene.GetSceneController<BaseSceneController>().SetSceneCanvasOrder(Root.GetSceneController<BaseSceneController>().GetTopSceneCanvasOrder() + 2);
+                 Root.GetSceneController<BaseSceneController>().eventSystem.enabled = true;
+                 
+                 
+                 
+             });
+
             }
         }
         public void CloseUniqueScene()
@@ -431,9 +383,8 @@ namespace UniFramework
                 if (popArgs != null)
                 {
 
-                    rootController.eventSystem.enabled = false;
                     rootController.SetEnableCanvas(false);
-
+                    Root.GetSceneController<BaseSceneController>().eventSystem.enabled = false;
                     var newScene = new SceneInfo(popArgs.name, LoadSceneMode.Additive, popArgs.args,
                         (info) =>
                         {
@@ -454,20 +405,14 @@ namespace UniFramework
                     };
 
                     this.currentPopup = newScene;
-                    GameSceneManager.Instance.LoadSceneAsync(newScene,
-                        () =>
-                        {
-                            rootController.eventSystem.enabled = true;
-                            newScene.GetSceneController<BaseSceneController>().SetSceneCanvasOrder(Root.GetSceneController<BaseSceneController>().GetTopSceneCanvasOrder() + 2);
-                        },
-                        (ex) =>
-                        {
-                            this.currentPopup = null;
-                            rootController.SetEnableCanvas(true);
-                            rootController.eventSystem.enabled = true;
-                            Debug.LogError(ex);
-                        }
-                    );
+                    GameSceneManager.Instance.LoadScene(newScene, _ =>
+                    {
+                        newScene.GetSceneController<BaseSceneController>().eventSystem.enabled = false;
+                        newScene.GetSceneController<BaseSceneController>().SetSceneCanvasOrder(Root.GetSceneController<BaseSceneController>().GetTopSceneCanvasOrder() + 2);
+                        Root.GetSceneController<BaseSceneController>().eventSystem.enabled = true;
+                        
+                    });
+
                 }
                 else
                 {
