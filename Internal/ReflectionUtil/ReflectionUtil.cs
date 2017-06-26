@@ -40,7 +40,7 @@ namespace UniFramework
 			
 				if (resultTypes [i].IsSubclassOf (type)
 
-				  && !(type.IsAbstract && resultTypes [i] == type)) {
+				  &&  !resultTypes[i].IsAbstract ) {
 					list.Add (resultTypes [i]);
 				}
 			}
