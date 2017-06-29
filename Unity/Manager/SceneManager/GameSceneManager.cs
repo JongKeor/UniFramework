@@ -36,7 +36,7 @@ namespace UniFramework
         protected SceneInfo root;
         protected Dictionary<Scene, SceneInfo> loadedSceneInfo = new Dictionary<Scene, SceneInfo>();
 
-        protected List<Scene> unloadingScene = new List<Scene>();
+
 
 
 
@@ -88,6 +88,7 @@ namespace UniFramework
                 onSceneUnLoad(info);
                 RemoveSceneInfo(scene);
             }
+
         }
 
 
@@ -136,15 +137,15 @@ namespace UniFramework
             Scene newScene = new Scene();
 #endif
             Scene currentScene = new Scene();
-            
+
             if (info.Mode == LoadSceneMode.Single)
             {
-                for (int i = 0; i < SceneManager.sceneCount; i++)
-                {
-                    unloadingScene.Add(SceneManager.GetSceneAt(i));
-                }
+                // for (int i = 0; i < SceneManager.sceneCount; i++)
+                // {
+                //     unloadingScene.Add(SceneManager.GetSceneAt(i));
+                // }
             }
-            
+
             SceneManager.LoadScene(info.Name, info.Mode);
             currentScene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
             if (info.Mode == LoadSceneMode.Single)
@@ -152,7 +153,7 @@ namespace UniFramework
                 root = info;
             }
 
-            
+
 #if MERGE_SCENE
             if (info.Mode == LoadSceneMode.Additive)
             {
@@ -167,7 +168,8 @@ namespace UniFramework
 #else
             AddSceneInfo(currentScene, info);
 #endif
-            info.OnOpen += _ =>{
+            info.OnOpen += _ =>
+            {
                 onLoad(_);
             };
 
@@ -185,17 +187,15 @@ namespace UniFramework
 
         public void CloseScene(SceneInfo info)
         {
-            if (unloadingScene.Contains(info.SceneData)) return;
-            if (SceneManager.sceneCount - unloadingScene.Count != 1)
-            {
-                StartCoroutine(UnloadingScene(info.SceneData));
-            }
+
+            StartCoroutine(UnloadingScene(info.SceneData));
+
 
         }
 
         private IEnumerator UnloadingScene(Scene scene)
         {
-            unloadingScene.Add(scene);
+
 #if MERGE_SCENE
             AsyncOperation op = SceneManager.UnloadSceneAsync(scene.name);
 #else
@@ -206,7 +206,7 @@ namespace UniFramework
                 while (!op.isDone)
                     yield return null;
             }
-            unloadingScene.Remove(scene);
+
         }
 
     }
