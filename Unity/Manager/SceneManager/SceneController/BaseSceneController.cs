@@ -120,8 +120,8 @@ namespace UniFramework
         protected virtual void Awake()
         {
             GameSceneManager.Instance.GetSceneInfo(this.Scene);
-            
-             Debug.Log("Awake " + name + " " + Time.frameCount + " " );
+
+            Debug.Log("Awake " + name + " " + Time.frameCount + " ");
 
         }
         protected virtual void Reset()
@@ -178,9 +178,10 @@ namespace UniFramework
 
         public virtual void OnOpen(Dictionary<string, object> arguments)
         {
-           
+
             Debug.Log("OnOpen " + name + " " + Time.frameCount + " " + gameObject.scene.GetHashCode());
-            if(Parent != null){
+            if (Parent != null)
+            {
                 SetSceneCanvasOrder(SceneDepth);
             }
         }
@@ -343,9 +344,9 @@ namespace UniFramework
                  newScene.GetSceneController<BaseSceneController>().eventSystem.enabled = false;
                  newScene.GetSceneController<BaseSceneController>().SetSceneCanvasOrder(Root.GetSceneController<BaseSceneController>().GetTopSceneCanvasOrder() + 2);
                  Root.GetSceneController<BaseSceneController>().eventSystem.enabled = true;
-                 
-                 
-                 
+
+
+
              });
 
             }
@@ -410,7 +411,7 @@ namespace UniFramework
                         newScene.GetSceneController<BaseSceneController>().eventSystem.enabled = false;
                         newScene.GetSceneController<BaseSceneController>().SetSceneCanvasOrder(Root.GetSceneController<BaseSceneController>().GetTopSceneCanvasOrder() + 2);
                         Root.GetSceneController<BaseSceneController>().eventSystem.enabled = true;
-                        
+
                     });
 
                 }
@@ -429,18 +430,19 @@ namespace UniFramework
 
         public void SetEnableCanvas(bool bEnable)
         {
-            GameObject shield = gameObject.FindAndCreateChildObjectByName(GAMEOBJECT_SHEILD);
+            GameObject shield = gameObject.FindAndCreateChildObjectByName(GAMEOBJECT_SHEILD, typeof(Canvas), typeof(Image));
             Canvas canvas = shield.GetComponent<Canvas>();
-            if (canvas == null)
+            if (canvas.renderMode != RenderMode.ScreenSpaceOverlay)
             {
-                canvas = shield.AddComponent<Canvas>();
                 canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                Image image = shield.AddComponent<Image>();
-                image.rectTransform.anchorMin = Vector2.zero;
-                image.rectTransform.anchorMax = Vector2.one;
-                image.rectTransform.sizeDelta = Vector2.zero;
-                image.color = new Color(0f, 0f, 0f, 0.5f);
             }
+            Image image = shield.GetComponent<Image>();
+            image.rectTransform.anchorMin = Vector2.zero;
+            image.rectTransform.anchorMax = Vector2.one;
+            image.rectTransform.sizeDelta = Vector2.zero;
+            image.rectTransform.localPosition = Vector2.zero;
+            image.color = new Color(0f, 0f, 0f, 0.5f);
+
             GraphicRaycaster caster = shield.GetOrAddComponent<GraphicRaycaster>();
             caster.enabled = !bEnable;
 

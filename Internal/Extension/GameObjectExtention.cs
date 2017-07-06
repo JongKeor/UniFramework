@@ -37,13 +37,13 @@ namespace UniFramework.Extension
             return target;
         }
 
-        public static GameObject FindAndCreateChildObjectByName(this GameObject self, string strName)
+        public static GameObject FindAndCreateChildObjectByName(this GameObject self, string strName ,params System.Type[] components)
         {
             GameObject ret = FindChildObjectByName(self, strName);
             if (ret == null)
             {
-                ret = new GameObject(strName);
-                ret.transform.parent = self.transform;
+                ret = new GameObject(strName,components);
+                ret.transform.SetParent(self.transform);
                 ret.transform.localPosition = Vector3.zero;
                 ret.transform.localRotation = Quaternion.identity;
                 ret.transform.localScale = Vector3.one;
